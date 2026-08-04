@@ -9,15 +9,27 @@ jobs:
   build:
     runs-on: macos-latest
 
+    env:
+      THEOS: ${{ github.workspace }}/theos
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install Theos
+      - name: Install ldid
+        run: brew install ldid
+
+      - name: Clone Theos
         run: |
-          bash -c "$(curl -fsSL https://raw.githubusercontent.com/theos/theos/master/bin/install-theos)"
-          echo "THEOS=$HOME/theos" >> $GITHUB_ENV
-          echo "$HOME/theos/bin" >> $GITHUB_PATH
+          git clone --recursive https://github.com/theos/theos.git $THEOS
+
+      - name: Download iOS SDK
+        run: |
+          curl -sL https://github.com/theos/sdks/archive/master.tar.gz \
+            | tar xz --strip=1 -C $THEOS/sdks
+
+      - name: Add Theos to PATH
+        run: echo "$THEOS/bin" >> $GITHUB_PATH
 
       - name: Build
         run: |
