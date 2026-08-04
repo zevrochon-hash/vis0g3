@@ -11,7 +11,7 @@ include $(THEOS)/makefiles/common.mk
 TWEAK_NAME = vis0g3
 
 vis0g3_FILES = \
-	Tweak.xmi \
+	Tweak.xm \
 	Sources/VZPreferences.mm \
 	Sources/VZFaceFeatureExtractor.mm \
 	Sources/VZFaceDatabase.mm \
@@ -48,7 +48,7 @@ include $(THEOS_MAKE_PATH)/tweak.mk
 TWEAK_NAME += vis0g3App
 
 vis0g3App_FILES = \
-	TweakApp.xmi \
+	TweakApp.xm \
 	Sources/VZPreferences.mm \
 	Sources/VZFaceFeatureExtractor.mm \
 	Sources/VZFaceDatabase.mm \
