@@ -117,11 +117,8 @@
                                   mediaType:AVMediaTypeVideo
                                    position:AVCaptureDevicePositionFront];
         frontCamera = ds.devices.firstObject;
-    } else {
-        for (AVCaptureDevice *d in [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo]) {
-            if (d.position == AVCaptureDevicePositionFront) { frontCamera = d; break; }
-        }
-    }
+    } 
+    
     if (!frontCamera) {
         NSError *err = [NSError errorWithDomain:kVZErrorDomain
                                           code:VZErrorCodeCameraUnavailable
@@ -175,7 +172,7 @@
             self->_previewLayer = nil;
         });
 
-        self->_videoOutput.sampleBufferDelegate = nil;
+        [self->_videoOutput setSampleBufferDelegate:nil queue:NULL];
         self->_videoOutput  = nil;
         self->_deviceInput  = nil;
         self->_session      = nil;
