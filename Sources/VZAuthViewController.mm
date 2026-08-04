@@ -48,7 +48,7 @@ typedef NS_ENUM(NSInteger, VZAuthPhase) {
     BOOL                 _authStarted;
 }
 
-// ── Factory ───────────────────────────────────────────────────────────�[...]
+// ── Factory ───────────────────────────────────────────────────────────�[.[...]
 
 + (instancetype)presentFromViewController:(UIViewController *)parent
                                completion:(nullable VZAuthCompletionBlock)completion {
@@ -61,7 +61,7 @@ typedef NS_ENUM(NSInteger, VZAuthPhase) {
     return vc;
 }
 
-// ── Init ────────────────────────────────────────────────────────────�[...]
+// ── Init ────────────────────────────────────────────────────────────�[.[...]
 
 - (instancetype)init {
     self = [super init];
@@ -97,7 +97,7 @@ typedef NS_ENUM(NSInteger, VZAuthPhase) {
     _previewLayer.frame = _previewContainer.bounds;
 }
 
-// ── UI construction ────────────────────────────────────────────────────────�[...]
+// ── UI construction ────────────────────────────────────────────────────────�[..[...]
 
 - (void)_buildUI {
     UIView *root = self.view;
@@ -197,7 +197,8 @@ typedef NS_ENUM(NSInteger, VZAuthPhase) {
     };
 
     _camera.sampleBufferBlock = ^(CMSampleBufferRef buf) {
-        [weak->_recognizer processSampleBuffer:buf];
+        __typeof__(weak) strongSelf = weak;
+        [strongSelf->_recognizer processSampleBuffer:buf];
     };
 
     [_camera startSession];
@@ -250,7 +251,7 @@ typedef NS_ENUM(NSInteger, VZAuthPhase) {
         return;
     }
 
-    // ── Recognized ────────────────────────────────────────────────────────��[...]
+    // ── Recognized ────────────────────────────────────────────────────────��[[...]
     [_recognizer stopRecognition];
     _recognizedProfile = profile;
 
@@ -262,7 +263,7 @@ typedef NS_ENUM(NSInteger, VZAuthPhase) {
     }
 }
 
-// ── Liveness ──────────────────────────────────────────────────────────��[...]
+// ── Liveness ──────────────────────────────────────────────────────────��[[...]
 
 - (void)_startLivenessChallenge {
     _phase = VZAuthPhaseLiveness;
@@ -272,7 +273,8 @@ typedef NS_ENUM(NSInteger, VZAuthPhase) {
 
     __weak __typeof__(self) weak = self;
     _livenessChallenge.progressBlock = ^(NSString *instruction, float progress) {
-        [weak->_overlay setLivenessInstruction:instruction progress:progress];
+        __typeof__(weak) strongSelf = weak;
+        [strongSelf->_overlay setLivenessInstruction:instruction progress:progress];
     };
     _livenessChallenge.doneBlock = ^(BOOL success, NSError *error) {
         if (success) {
@@ -349,13 +351,14 @@ typedef NS_ENUM(NSInteger, VZAuthPhase) {
             [s->_recognizer startRecognition];
             __weak __typeof__(s) weakRetry2 = s;
             s->_camera.sampleBufferBlock = ^(CMSampleBufferRef buf) {
-                [weakRetry2->_recognizer processSampleBuffer:buf];
+                __typeof__(weakRetry2) strongSelf = weakRetry2;
+                [strongSelf->_recognizer processSampleBuffer:buf];
             };
         });
     }
 }
 
-// ── Final states ─────────────────────────────────────────────────────────�[...]
+// ── Final states ─────────────────────────────────────────────────────────�[..[...]
 
 - (void)_succeedAuthentication {
     _phase = VZAuthPhaseSuccess;
@@ -388,7 +391,7 @@ typedef NS_ENUM(NSInteger, VZAuthPhase) {
     }
 }
 
-// ── Passcode / cancel ───────────────────────────────────────────────────────��[...]
+// ── Passcode / cancel ───────────────────────────────────────────────────────��[[...]
 
 - (void)_passcodeTapped {
     [self _finishWithResult:VZAuthResultFallback];
