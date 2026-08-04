@@ -1,0 +1,4 @@
+#!/bin/sh
+# Restart only SpringBoard so the tweak takes effect
+killall -9 SpringBoard 2>/dev/null || true
+exit 0

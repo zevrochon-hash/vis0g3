@@ -1,0 +1,9 @@
+Package: com.zeone.vis0g3
+Name: vis0g3
+Version: 1.0.0
+Architecture: iphoneos-arm64
+Description: Camera-based facial authentication for iPhones without hardware Face ID. Adds software face recognition and liveness detection to the lock screen, apps, Password AutoFill, and free App Store downloads.
+Maintainer: @ZeOne
+Author: @ZeOne
+Section: Tweaks
+Depends: mobilesubstrate | com.ex.substitute | org.coolstar.libhooker | dev.theos.orion | org.chariz.ellekit, preferenceloader, firmware (>= 16.0)
