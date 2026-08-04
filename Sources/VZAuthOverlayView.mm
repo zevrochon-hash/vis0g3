@@ -103,7 +103,7 @@ static CAShapeLayer *ringLayer(CGFloat radius, UIColor *color) {
 }
 
 - (void)_buildLayers {
-    CGPoint center = CGPointMake(self.bounds.midX, self.bounds.midY);
+    CGPoint center = CGPointMake(CGRectGetMidX(self.bounds), CGRectGetMidY(self.bounds));
 
     // Subtle glow behind glyph
     _glowLayer = [CAGradientLayer layer];
@@ -224,7 +224,7 @@ static CAShapeLayer *ringLayer(CGFloat radius, UIColor *color) {
     // Scan line sweep
     _scanLineLayer.opacity = 1;
     CABasicAnimation *sweep = [CABasicAnimation animationWithKeyPath:@"position.y"];
-    CGFloat cy = self.bounds.midY;
+    CGFloat cy = CGRectGetMidY(self.bounds);
     sweep.fromValue   = @(cy - kRingRadius + 6);
     sweep.toValue     = @(cy + kRingRadius - 6);
     sweep.duration    = 1.2;
@@ -339,7 +339,7 @@ static CAShapeLayer *ringLayer(CGFloat radius, UIColor *color) {
 - (void)layoutSubviews {
     [super layoutSubviews];
     // Re-center layer-based elements when bounds change
-    CGPoint center = CGPointMake(self.bounds.midX, self.bounds.midY);
+    CGPoint center = CGPointMake(CGRectGetMidX(self.bounds), CGRectGetMidY(self.bounds));
     _scanRingLayer.position    = center;
     _scanRingProgress.position = center;
     _faceGlyphLayer.position   = CGPointMake(center.x - kGlyphSize/2, center.y - kGlyphSize/2);
