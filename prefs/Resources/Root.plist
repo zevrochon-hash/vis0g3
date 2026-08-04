@@ -1,0 +1,175 @@
+{
+    title = "vis0g3";
+    items = (
+
+        /* ── Main switch ──────────────────────────────────────────────── */
+        {
+            cell = PSGroupCell;
+            label = "";
+            footerText = "Camera-based facial authentication by @ZeOne. Requires at least one enrolled face.";
+        },
+        {
+            cell = PSSwitchCell;
+            label = "Enable vis0g3";
+            defaults = "com.zeone.vis0g3";
+            key = "enabled";
+            default = 1;
+            PostNotification = "com.zeone.vis0g3/preferences.changed";
+        },
+
+        /* ── Face management ──────────────────────────────────────────── */
+        {
+            cell = PSGroupCell;
+            label = "Enrolled Faces";
+            footerText = "Up to 4 faces can be enrolled. All data is stored locally on this device.";
+        },
+        {
+            cell = PSLinkCell;
+            label = "Manage Faces";
+            detail = VZFaceListController;
+            isController = 1;
+        },
+
+        /* ── Unlock behavior ──────────────────────────────────────────── */
+        {
+            cell = PSGroupCell;
+            label = "Unlock Behavior";
+        },
+        {
+            cell = PSSwitchCell;
+            label = "Go Directly to Home Screen";
+            defaults = "com.zeone.vis0g3";
+            key = "directHomeScreen";
+            default = 0;
+            PostNotification = "com.zeone.vis0g3/preferences.changed";
+        },
+
+        /* ── Screen flash ─────────────────────────────────────────────── */
+        {
+            cell = PSGroupCell;
+            label = "Camera";
+            footerText = "Screen flash temporarily brightens the display to illuminate your face in low light.";
+        },
+        {
+            cell = PSSwitchCell;
+            label = "Low-Light Screen Flash";
+            defaults = "com.zeone.vis0g3";
+            key = "screenFlashEnabled";
+            default = 1;
+            PostNotification = "com.zeone.vis0g3/preferences.changed";
+        },
+
+        /* ── App authentication ───────────────────────────────────────── */
+        {
+            cell = PSGroupCell;
+            label = "App Authentication";
+            footerText = "When enabled, vis0g3 replaces Touch ID prompts in supported apps, Password AutoFill, and free App Store downloads. Apple Pay and paid purchases always use the device's built-in secure authentication.";
+        },
+        {
+            cell = PSSwitchCell;
+            label = "Use for App Authentication";
+            defaults = "com.zeone.vis0g3";
+            key = "appAuthEnabled";
+            default = 1;
+            PostNotification = "com.zeone.vis0g3/preferences.changed";
+        },
+
+        /* ── Recognition sensitivity ──────────────────────────────────── */
+        {
+            cell = PSGroupCell;
+            label = "Recognition Sensitivity";
+            footerText = "Higher values are stricter — less likely to accept a look-alike but more likely to fail on your own face at difficult angles. Default 0.82 is recommended.";
+        },
+        {
+            cell = PSSliderCell;
+            label = "Confidence Threshold";
+            defaults = "com.zeone.vis0g3";
+            key = "recognitionThreshold";
+            default = 0.82;
+            min = 0.65;
+            max = 0.97;
+            showValue = 1;
+            PostNotification = "com.zeone.vis0g3/preferences.changed";
+        },
+
+        /* ── Liveness security ────────────────────────────────────────── */
+        {
+            cell = PSGroupCell;
+            label = "Liveness Security";
+            footerText = "Liveness checks require you to move your head during authentication, preventing a static photo from being used. Each toggle is independent — combine them for stronger security.";
+        },
+        {
+            cell = PSSwitchCell;
+            label = "Require Head Up/Down Movement";
+            defaults = "com.zeone.vis0g3";
+            key = "livenessHeadUpDown";
+            default = 0;
+            PostNotification = "com.zeone.vis0g3/preferences.changed";
+        },
+        {
+            cell = PSSwitchCell;
+            label = "Require Head Left/Right Movement";
+            defaults = "com.zeone.vis0g3";
+            key = "livenessHeadLeftRight";
+            default = 0;
+            PostNotification = "com.zeone.vis0g3/preferences.changed";
+        },
+        {
+            cell = PSSwitchCell;
+            label = "Require Forehead/Chin Movement";
+            defaults = "com.zeone.vis0g3";
+            key = "livenessForeheadChin";
+            default = 0;
+            PostNotification = "com.zeone.vis0g3/preferences.changed";
+        },
+        {
+            cell = PSSwitchCell;
+            label = "Require Left/Right Head Turn";
+            defaults = "com.zeone.vis0g3";
+            key = "livenessLeftRightTurn";
+            default = 0;
+            PostNotification = "com.zeone.vis0g3/preferences.changed";
+        },
+        {
+            cell = PSGroupCell;
+            label = "";
+            footerText = "Randomizing the liveness challenge prevents someone from knowing the movement sequence ahead of time. Requiring multiple movements forces more than one head movement per authentication.";
+        },
+        {
+            cell = PSSwitchCell;
+            label = "Randomize Liveness Challenge";
+            defaults = "com.zeone.vis0g3";
+            key = "livenessRandomize";
+            default = 0;
+            PostNotification = "com.zeone.vis0g3/preferences.changed";
+        },
+        {
+            cell = PSSwitchCell;
+            label = "Require Multiple Movements";
+            defaults = "com.zeone.vis0g3";
+            key = "livenessMultipleMovements";
+            default = 0;
+            PostNotification = "com.zeone.vis0g3/preferences.changed";
+        },
+
+        /* ── Reset ────────────────────────────────────────────────────── */
+        {
+            cell = PSGroupCell;
+            label = "";
+        },
+        {
+            cell = PSButtonCell;
+            label = "Reset All Settings";
+            action = "resetToDefaults";
+            isDestructive = 1;
+        },
+
+        /* ── Credits ──────────────────────────────────────────────────── */
+        {
+            cell = PSGroupCell;
+            label = "";
+            footerText = "vis0g3 1.0.0 by @ZeOne\nDUCO: ZeOne22\nXMR: 42pknkTyrsHcjg6DQPh4hYBpi4Jz1rjCxXMXf4tVnN2fSKCW1ShR4ZYG2szFZrkjZMRKrpo9YNrc9KFBLZpEqVUC4dYuVkF";
+        }
+
+    );
+}
