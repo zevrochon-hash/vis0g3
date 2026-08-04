@@ -1,0 +1,31 @@
+name: Build vis0g3
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Theos
+        run: |
+          bash -c "$(curl -fsSL https://raw.githubusercontent.com/theos/theos/master/bin/install-theos)"
+          echo "THEOS=$HOME/theos" >> $GITHUB_ENV
+          echo "$HOME/theos/bin" >> $GITHUB_PATH
+
+      - name: Build
+        run: |
+          make clean package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless
+
+      - name: Upload .deb
+        uses: actions/upload-artifact@v4
+        with:
+          name: vis0g3-deb
+          path: packages/*.deb
+          retention-days: 90
