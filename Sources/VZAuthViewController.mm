@@ -48,7 +48,7 @@ typedef NS_ENUM(NSInteger, VZAuthPhase) {
     BOOL                 _authStarted;
 }
 
-// ── Factory ───────────────────────────────────────────────────────────�[.[...]
+// ── Factory ───────────────────────────────────────────────────────────�[...]
 
 + (instancetype)presentFromViewController:(UIViewController *)parent
                                completion:(nullable VZAuthCompletionBlock)completion {
@@ -61,7 +61,7 @@ typedef NS_ENUM(NSInteger, VZAuthPhase) {
     return vc;
 }
 
-// ── Init ────────────────────────────────────────────────────────────�[.[...]
+// ── Init ────────────────────────────────────────────────────────────�[...]
 
 - (instancetype)init {
     self = [super init];
@@ -170,7 +170,7 @@ typedef NS_ENUM(NSInteger, VZAuthPhase) {
     ]];
 }
 
-// ── Auth flow ──────────────────────────────────────────────────────────�[...]
+// ── Auth flow ──────────────────────────────────────────────────────────�[..[...]
 
 - (void)beginAuthentication {
     if (_authStarted || _phase == VZAuthPhaseDone) return;
@@ -197,7 +197,8 @@ typedef NS_ENUM(NSInteger, VZAuthPhase) {
     };
 
     _camera.sampleBufferBlock = ^(CMSampleBufferRef buf) {
-        __typeof__(weak) strongSelf = weak;
+        VZAuthViewController *strongSelf = weak;
+        if (!strongSelf) return;
         [strongSelf->_recognizer processSampleBuffer:buf];
     };
 
@@ -351,7 +352,8 @@ typedef NS_ENUM(NSInteger, VZAuthPhase) {
             [s->_recognizer startRecognition];
             __weak __typeof__(s) weakRetry2 = s;
             s->_camera.sampleBufferBlock = ^(CMSampleBufferRef buf) {
-                __typeof__(weakRetry2) strongSelf = weakRetry2;
+                VZAuthViewController *strongSelf = weakRetry2;
+                if (!strongSelf) return;
                 [strongSelf->_recognizer processSampleBuffer:buf];
             };
         });
