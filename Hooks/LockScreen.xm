@@ -1,21 +1,11 @@
 // Hooks/LockScreen.xm
-// Intercepts the iOS 16 lock screen biometric authentication flow and replaces
-// it with vis0g3 camera-based facial recognition.
-//
-// Hook targets (iOS 16 / Dopamine / SpringBoard):
-//   SBUIBiometricResource  — manages biometric UI state on the cover sheet
-//   SBLockScreenManager    — detects lock/wake transitions
-//   SBFingerprintRecognitionManager — intercepts Touch ID result delivery (iPhone 8)
-//   SBPasscodeManager       — used to programmatically succeed authentication
-//
-// Private headers derived from public class-dumps and open-source headers.
-// Availability is checked at runtime before use.
 
 #import "../Sources/VZGlobals.h"
 #import "../Sources/VZPreferences.h"
 #import "../Sources/VZFaceDatabase.h"
 #import "../Sources/VZAuthViewController.h"
 #import <UIKit/UIKit.h>
+#import <objc/runtime.h>
 
 // ── Forward-declare private classes ──────────────────────────────────────────
 
@@ -38,19 +28,17 @@
 
 // ── Module-level state ────────────────────────────────────────────────────────
 
-static BOOL gLockScreenAuthPresented     = NO;
-static UIViewController *gAuthParentVC   = nil;
+static BOOL gLockScreenAuthPresented = NO;
 
-// Present our auth VC from the key window's root VC
-static void PresentLockScreenAuth(void) {
-    if (gLockScreenAuthPresented) return;
-    if (![VZPreferences sharedPreferences].enabled) return;
-    if ([VZFaceDatabase sharedDatabase].profiles.count == 0) return;
+// ── Helper: resolve root view controller ─────────────────────────────────────
 
+static UIViewController *VZTopViewController(void) {
     UIViewController *rootVC = nil;
+
     if (@available(iOS 13.0, *)) {
         for (UIScene *scene in [UIApplication sharedApplication].connectedScenes) {
-            if ([scene isKindOfClass:[UIWindowScene class]]) {
+            if ([scene isKindOfClass:[UIWindowScene class]] &&
+                scene.activationState == UISceneActivationStateForegroundActive) {
                 UIWindowScene *ws = (UIWindowScene *)scene;
                 for (UIWindow *w in ws.windows) {
                     if (w.isKeyWindow) { rootVC = w.rootViewController; break; }
@@ -59,76 +47,93 @@ static void PresentLockScreenAuth(void) {
             if (rootVC) break;
         }
     }
-    if (!rootVC) {
-        rootVC = [UIApplication sharedApplication].keyWindow.rootViewController;
-    }
-    if (!rootVC) return;
 
-    // Walk to the topmost presented controller
+    if (!rootVC) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+        rootVC = [UIApplication sharedApplication].keyWindow.rootViewController;
+#pragma clang diagnostic pop
+    }
+
     while (rootVC.presentedViewController) {
         rootVC = rootVC.presentedViewController;
     }
-    gAuthParentVC = rootVC;
+    return rootVC;
+}
+
+// ── Helper: call unlock on the system ────────────────────────────────────────
+
+static void VZTriggerSystemUnlock(void) {
+    Class pmClass = objc_getClass("SBPasscodeManager");
+    if (pmClass && [pmClass respondsToSelector:@selector(sharedManager)]) {
+        id pm = [pmClass performSelector:@selector(sharedManager)];
+        SEL authSel = @selector(successfulAuthenticationWithRequest:presencePolicy:policy:);
+        if (pm && [pm respondsToSelector:authSel]) {
+            [pm successfulAuthenticationWithRequest:nil presencePolicy:1 policy:0];
+            return;
+        }
+    }
+
+    Class lmClass = objc_getClass("SBLockScreenManager");
+    if (lmClass && [lmClass respondsToSelector:@selector(sharedInstance)]) {
+        id lm = [lmClass performSelector:@selector(sharedInstance)];
+        SEL unlockSel = @selector(unlockUIFromSource:withOptions:);
+        if (lm && [lm respondsToSelector:unlockSel]) {
+            NSInvocation *inv = [NSInvocation
+                invocationWithMethodSignature:[lm methodSignatureForSelector:unlockSel]];
+            inv.target   = lm;
+            inv.selector = unlockSel;
+            NSInteger src = 5;
+            id opts = nil;
+            [inv setArgument:&src  atIndex:2];
+            [inv setArgument:&opts atIndex:3];
+            [inv invoke];
+        }
+    }
+}
+
+// ── Present vis0g3 auth on the lock screen ────────────────────────────────────
+
+static void PresentLockScreenAuth(void) {
+    if (gLockScreenAuthPresented) return;
+    if (![VZPreferences sharedPreferences].enabled) return;
+    if ([VZFaceDatabase sharedDatabase].profiles.count == 0) return;
+
+    UIViewController *rootVC = VZTopViewController();
+    if (!rootVC) return;
+
     gLockScreenAuthPresented = YES;
 
     [VZAuthViewController presentFromViewController:rootVC completion:^(VZAuthResult result) {
         gLockScreenAuthPresented = NO;
-        gAuthParentVC            = nil;
 
-        switch (result) {
-            case VZAuthResultSuccess: {
-                // Unlock the device via SBPasscodeManager
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    id pm = [%c(SBPasscodeManager) respondsToSelector:@selector(sharedManager)]
-                             ? [%c(SBPasscodeManager) sharedManager] : nil;
-                    if (pm && [pm respondsToSelector:@selector(successfulAuthenticationWithRequest:presencePolicy:policy:)]) {
-                        [pm successfulAuthenticationWithRequest:nil presencePolicy:1 policy:0];
-                    } else {
-                        // Fallback: try unlocking via SBLockScreenManager
-                        id lm = [%c(SBLockScreenManager) respondsToSelector:@selector(sharedInstance)]
-                                  ? [%c(SBLockScreenManager) sharedInstance] : nil;
-                        if (lm && [lm respondsToSelector:@selector(unlockUIFromSource:withOptions:)]) {
-                            [lm unlockUIFromSource:5 withOptions:nil];
-                        }
-                    }
+        if (result == VZAuthResultSuccess) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                VZTriggerSystemUnlock();
 
-                    // Optional direct Home Screen
-                    if ([VZPreferences sharedPreferences].directHomeScreen) {
-                        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.15 * NSEC_PER_SEC)),
-                                       dispatch_get_main_queue(), ^{
-                            id lm = [%c(SBLockScreenManager) respondsToSelector:@selector(sharedInstance)]
-                                      ? [%c(SBLockScreenManager) sharedInstance] : nil;
-                            if (lm && [lm respondsToSelector:@selector(unlockUIFromSource:withOptions:)]) {
-                                [lm unlockUIFromSource:5 withOptions:nil];
-                            }
-                        });
-                    }
-                });
-                break;
-            }
-            case VZAuthResultFallback:
-            case VZAuthResultCancelled:
-            case VZAuthResultFailure:
-                // Passcode UI remains available normally — nothing to do
-                break;
+                if ([VZPreferences sharedPreferences].directHomeScreen) {
+                    dispatch_after(
+                        dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.15 * NSEC_PER_SEC)),
+                        dispatch_get_main_queue(), ^{
+                        VZTriggerSystemUnlock();
+                    });
+                }
+            });
         }
     }];
 }
 
-// ── SBLockScreenManager — detect device waking to locked state ────────────────
+// ── SBLockScreenManager — detect device waking while locked ──────────────────
 
 %hook SBLockScreenManager
 
-- (void)_handleLockUIRequested {
-    %orig;
-}
-
-// Called each time the screen wakes while locked
 - (void)_handleActivationUILockStateChanged {
     %orig;
-    if (![%c(SBLockScreenManager) respondsToSelector:@selector(sharedInstance)]) return;
-    id shared = [%c(SBLockScreenManager) sharedInstance];
-    if (![shared isUILocked]) return;
+    BOOL locked = NO;
+    if ([self respondsToSelector:@selector(isUILocked)]) {
+        locked = [self isUILocked];
+    }
+    if (!locked) return;
 
     dispatch_async(dispatch_get_main_queue(), ^{
         PresentLockScreenAuth();
@@ -137,20 +142,16 @@ static void PresentLockScreenAuth(void) {
 
 %end
 
-// ── SBUIBiometricResource — iOS 16 cover sheet biometric activation ───────────
+// ── SBUIBiometricResource — intercept Touch ID activation on cover sheet ──────
 
 %hook SBUIBiometricResource
 
 - (void)enableBiometricFromSource:(NSInteger)source {
-    if (![VZPreferences sharedPreferences].enabled) {
+    if (![VZPreferences sharedPreferences].enabled ||
+        [VZFaceDatabase sharedDatabase].profiles.count == 0) {
         %orig;
         return;
     }
-    if ([VZFaceDatabase sharedDatabase].profiles.count == 0) {
-        %orig;
-        return;
-    }
-    // Don't call %orig — we replace the biometric request
     dispatch_async(dispatch_get_main_queue(), ^{
         PresentLockScreenAuth();
     });
@@ -158,7 +159,7 @@ static void PresentLockScreenAuth(void) {
 
 %end
 
-// ── Ensure cleanup on SpringBoard restart ────────────────────────────────────
+// ── SpringBoard — clean up state on launch ────────────────────────────────────
 
 %hook SpringBoard
 
