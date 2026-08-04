@@ -16,11 +16,6 @@
 #import "Sources/VZPreferences.h"
 #import "Sources/VZFaceDatabase.h"
 
-// ── Include hook definitions ──────────────────────────────────────────────────
-// Logos processes the entire translation unit together, so #include here
-// is exactly the same as pasting the code inline.
-#include "Hooks/LockScreen.xm"
-#include "Hooks/Authentication.xm"
 
 // ── Constructor ───────────────────────────────────────────────────────────────
 
