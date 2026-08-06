@@ -16,8 +16,6 @@
 #import "Sources/VZFaceDatabase.h"
 #import "Sources/VZAuthViewController.h"
 
-// Include LAContext hooks (same file, no duplication of logic)
-#include "Hooks/Authentication.xm"
 
 %ctor {
     @autoreleasepool {
