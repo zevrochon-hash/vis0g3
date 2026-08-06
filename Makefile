@@ -31,10 +31,6 @@ vis0g3_FRAMEWORKS = \
 	CoreGraphics \
 	QuartzCore
 
-vis0g3_PRIVATE_FRAMEWORKS = \
-	FrontBoardServices \
-	BackBoardServices \
-	LocalAuthentication
 
 vis0g3_LIBRARIES = substrate
 vis0g3_CFLAGS    = -fobjc-arc -Wall -Wno-unused-variable
