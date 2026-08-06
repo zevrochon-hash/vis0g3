@@ -36,6 +36,7 @@ vis0g3_LIBRARIES = substrate
 vis0g3_CFLAGS    = -fobjc-arc -Wall -Wno-unused-variable
 vis0g3_CCFLAGS   = -fobjc-arc -Wall -std=c++17
 vis0g3_CFLAGS += -fobjc-arc
+vis0g3_LDFLAGS = -lc++
 
 include $(THEOS_MAKE_PATH)/tweak.mk
 
