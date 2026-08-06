@@ -223,17 +223,25 @@ static const NSInteger kSamplesPerStage = 2;
 - (void)_startCamera {
     _camera = [VZCameraController sharedController];
     __weak __typeof__(self) weak = self;
-    _camera.stateBlock = ^(VZCameraState state, NSError *err) {
-        if (state == VZCameraStateRunning) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                self->_previewLayer = self->_camera.previewLayer;
-                if (self->_previewLayer) {
-                    self->_previewLayer.frame = self->_previewContainer.bounds;
-                    [self->_previewContainer.layer insertSublayer:self->_previewLayer atIndex:0];
-                }
-            });
-        }
-    };
+    __weak __typeof__(self) weakSelf = self;
+
+_camera.stateBlock = ^(VZCameraState state, NSError *err) {
+    __strong __typeof__(weakSelf) strongSelf = weakSelf;
+    if (!strongSelf) return;
+
+    if (state == VZCameraStateRunning) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            __strong __typeof__(weakSelf) strongSelf = weakSelf;
+            if (!strongSelf) return;
+
+            strongSelf->_previewLayer = strongSelf->_camera.previewLayer;
+            if (strongSelf->_previewLayer) {
+                strongSelf->_previewLayer.frame = strongSelf->_previewContainer.bounds;
+                [strongSelf->_previewContainer.layer insertSublayer:strongSelf->_previewLayer atIndex:0];
+            }
+        });
+    }
+};
     [_camera startSession];
     _recognizer = [[VZFaceRecognizer alloc] init];
     // No resultBlock needed for enrollment — we use one-shot capture
