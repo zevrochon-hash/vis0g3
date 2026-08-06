@@ -45,6 +45,7 @@ TWEAK_NAME += vis0g3App
 
 vis0g3App_FILES = \
 	TweakApp.xm \
+	Hooks/Authentication.xm \
 	Sources/VZPreferences.mm \
 	Sources/VZFaceFeatureExtractor.mm \
 	Sources/VZFaceDatabase.mm \
