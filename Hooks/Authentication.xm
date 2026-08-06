@@ -43,20 +43,7 @@
     // Find the topmost view controller to present on
     UIViewController *rootVC = nil;
 
-    if (!rootVC && @available(iOS 13.0, *)) {
-    for (UIScene *scene in [UIApplication sharedApplication].connectedScenes) {
-        if ([scene isKindOfClass:[UIWindowScene class]]) {
-            UIWindowScene *windowScene = (UIWindowScene *)scene;
-            for (UIWindow *window in windowScene.windows) {
-                if (window.isKeyWindow) {
-                    rootVC = window.rootViewController;
-                    break;
-                }
-            }
-        }
-        if (rootVC) break;
-    }
-}
+
     while (rootVC.presentedViewController) {
         rootVC = rootVC.presentedViewController;
     }
