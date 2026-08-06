@@ -2,40 +2,59 @@ name: Build vis0g3
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: macos-15
 
     env:
       THEOS: ${{ github.workspace }}/theos
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install ldid
-        run: brew install ldid
+      - name: Install dependencies
+        run: |
+          brew update
+          brew install ldid
 
       - name: Clone Theos
         run: |
-          git clone --recursive https://github.com/theos/theos.git $THEOS
+          git clone --recursive https://github.com/theos/theos.git "$THEOS"
 
-      - name: Download iOS SDK
+      - name: Download Theos SDKs
         run: |
-          curl -sL https://github.com/theos/sdks/archive/master.tar.gz \
-            | tar xz --strip=1 -C $THEOS/sdks
+          mkdir -p "$THEOS/sdks"
+          curl -L https://github.com/theos/sdks/archive/master.tar.gz \
+            | tar -xz --strip-components=1 -C "$THEOS/sdks"
 
       - name: Add Theos to PATH
-        run: echo "$THEOS/bin" >> $GITHUB_PATH
+        run: echo "$THEOS/bin" >> "$GITHUB_PATH"
 
-      - name: Build
+      - name: Show installed Xcodes
+        run: ls /Applications | grep Xcode || true
+
+      - name: Select Xcode 16
+        run: |
+          if [ -d /Applications/Xcode_16.4.app ]; then
+            sudo xcode-select -s /Applications/Xcode_16.4.app
+          elif [ -d /Applications/Xcode_16.3.app ]; then
+            sudo xcode-select -s /Applications/Xcode_16.3.app
+          elif [ -d /Applications/Xcode.app ]; then
+            sudo xcode-select -s /Applications/Xcode.app
+          fi
+
+          xcodebuild -version
+
+      - name: Build package
         run: |
           make clean package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless
 
-      - name: Upload .deb
+      - name: Upload package
         uses: actions/upload-artifact@v4
         with:
           name: vis0g3-deb
