@@ -6,6 +6,8 @@
 
 #import <dlfcn.h>
 #import <objc/runtime.h>
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warc-performSelector-leaks"
 
 static NSString * const kVZBundleID      = @"com.zeone.vis0g3";
 static NSString * const kVZFaceDBPath    = @"/var/mobile/Library/Preferences/com.zeone.vis0g3.faces.plist";
@@ -259,13 +261,13 @@ forRowAtIndexPath:(NSIndexPath *)ip {
     if (!enrollVC) return;
 
     // Set completion block via associated object trick (selector not available at compile time)
-    __weak typeof(self) weak = self;
+    __weak VZFaceListController *weak = self;
     void(^completion)(BOOL, NSError *) = ^(BOOL success, NSError *err) {
         [weak _loadProfiles];
         [weak.tableView reloadData];
         if (success) {
             UIAlertController *ok = [UIAlertController alertControllerWithTitle:@"Enrolled"
-                                                                        message:[NSString stringWithFormat:@""%@" has been enrolled.", name]
+                                                                        message:[NSString stringWithFormat:@"%@ has been enrolled.", name]
                                                                  preferredStyle:UIAlertControllerStyleAlert];
             [ok addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil]];
             [weak presentViewController:ok animated:YES completion:nil];
@@ -305,7 +307,7 @@ forRowAtIndexPath:(NSIndexPath *)ip {
 
 - (void)_confirmRemove:(NSString *)profileID name:(NSString *)name {
     UIAlertController *alert =
-        [UIAlertController alertControllerWithTitle:[NSString stringWithFormat:@"Remove "%@"?", name]
+        [UIAlertController alertControllerWithTitle:[NSString stringWithFormat:@"Remove \"%@\"?", name]
                                             message:@"This face will no longer be able to authenticate."
                                      preferredStyle:UIAlertControllerStyleAlert];
     [alert addAction:[UIAlertAction actionWithTitle:@"Remove"
@@ -320,3 +322,4 @@ forRowAtIndexPath:(NSIndexPath *)ip {
 }
 
 @end
+#pragma clang diagnostic pop
