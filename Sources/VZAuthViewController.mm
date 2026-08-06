@@ -273,10 +273,13 @@ typedef NS_ENUM(NSInteger, VZAuthPhase) {
     _livenessChallenge = [VZLivenessChallenge challengeFromPreferences:prefs.livenessRandomize];
 
     __weak __typeof__(self) weak = self;
-    _livenessChallenge.progressBlock = ^(NSString *instruction, float progress) {
-        __typeof__(weak) strongSelf = weak;
-        [strongSelf->_overlay setLivenessInstruction:instruction progress:progress];
-    };
+        _livenessChallenge.progressBlock = ^(NSString *instruction, float progress) {
+        __strong __typeof__(weak) strongSelf = weak;
+        if (!strongSelf) return;
+
+    [strongSelf->_overlay setLivenessInstruction:instruction
+                                        progress:progress];
+};
     _livenessChallenge.doneBlock = ^(BOOL success, NSError *error) {
         if (success) {
             [weak _succeedAuthentication];
