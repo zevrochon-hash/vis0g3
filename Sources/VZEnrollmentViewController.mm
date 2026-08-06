@@ -296,7 +296,7 @@ _camera.stateBlock = ^(VZCameraState state, NSError *err) {
     NSInteger samplesNeeded = (_currentStage == VZEnrollStageCenter) ? kSamplesPerStage : kSamplesPerStage;
     if (_samplesThisStage >= samplesNeeded) {
         // Advance stage
-        _currentStage++;
+        _currentStage = (VZEnrollStage)((NSInteger)_currentStage + 1);
         _samplesThisStage = 0;
 
         if ((NSInteger)_currentStage >= VZEnrollStageCount) {
