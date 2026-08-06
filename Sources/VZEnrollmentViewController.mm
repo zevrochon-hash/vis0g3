@@ -222,7 +222,7 @@ static const NSInteger kSamplesPerStage = 2;
 
 - (void)_startCamera {
     _camera = [VZCameraController sharedController];
-    __weak __typeof__(self) weak = self;
+    
     __weak __typeof__(self) weakSelf = self;
 
 _camera.stateBlock = ^(VZCameraState state, NSError *err) {
