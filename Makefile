@@ -32,7 +32,6 @@ vis0g3_FRAMEWORKS = \
 	QuartzCore
 
 vis0g3_PRIVATE_FRAMEWORKS = \
-	SpringBoardServices \
 	FrontBoardServices \
 	BackBoardServices \
 	LocalAuthentication
