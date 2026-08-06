@@ -19,7 +19,7 @@
 
 %hook LAContext
 
-- (void)evaluatePolicy:(LAPolicyDeviceOwnerAuthentication)policy
+- (void)evaluatePolicy:(LAPolicy)policy
        localizedReason:(NSString *)localizedReason
                  reply:(void(^)(BOOL success, NSError *error))reply {
 
@@ -107,7 +107,7 @@
 
 // ── canEvaluatePolicy — report biometrics as available ────────────────────────
 
-- (BOOL)canEvaluatePolicy:(LAPolicyDeviceOwnerAuthentication)policy error:(NSError **)outError {
+- (BOOL)canEvaluatePolicy:(LAPolicy)policy error:(NSError **)outError {
     VZPreferences *prefs = [VZPreferences sharedPreferences];
     if (prefs.enabled && prefs.appAuthEnabled &&
         [VZFaceDatabase sharedDatabase].profiles.count > 0 &&
