@@ -31,6 +31,7 @@ jobs:
           mkdir -p "$THEOS/sdks"
           curl -L https://github.com/theos/sdks/archive/master.tar.gz \
             | tar -xz --strip-components=1 -C "$THEOS/sdks"
+          find "$THEOS/sdks" -path "*/Preferences.framework" -print
 
       - name: Add Theos to PATH
         run: echo "$THEOS/bin" >> "$GITHUB_PATH"
@@ -47,7 +48,6 @@ jobs:
           elif [ -d /Applications/Xcode.app ]; then
             sudo xcode-select -s /Applications/Xcode.app
           fi
-
           xcodebuild -version
 
       - name: Build package
