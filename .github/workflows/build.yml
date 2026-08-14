@@ -28,13 +28,17 @@ jobs:
 
       - name: Download Theos SDKs
         run: |
-          git clone --depth 1 https://github.com/theos/sdks.git "$THEOS/sdks"
+          mkdir -p "$THEOS/sdks"
+          curl -L https://github.com/theos/sdks/archive/master.tar.gz \
+            | tar -xz --strip-components=1 -C "$THEOS/sdks"
+          find "$THEOS/sdks" -name "Preferences.framework" -print
 
       - name: Add Theos to PATH
         run: echo "$THEOS/bin" >> "$GITHUB_PATH"
 
       - name: Show installed Xcodes
-        run: ls /Applications | grep Xcode || true
+        run: |
+          ls /Applications | grep Xcode || true
 
       - name: Select Xcode 16
         run: |
@@ -45,11 +49,8 @@ jobs:
           elif [ -d /Applications/Xcode.app ]; then
             sudo xcode-select -s /Applications/Xcode.app
           fi
-          xcodebuild -version
 
-      - name: Check Preferences framework
-        run: |
-          find "$THEOS/sdks" -path "*/Preferences.framework" -print
+          xcodebuild -version
 
       - name: Build package
         run: |
