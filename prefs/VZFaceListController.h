@@ -1,4 +1,4 @@
-#import <Preferences/PSListController.h>
+#import <UIKit/UIKit.h>
 
-@interface VZFaceListController : PSListController
+@interface VZFaceListController : UITableViewController
 @end
