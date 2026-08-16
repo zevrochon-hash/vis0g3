@@ -1,6 +1,6 @@
 include $(THEOS)/makefiles/common.mk
 
-BUNDLE_NAME = vis0g3
+BUNDLE_NAME = vis0g3Prefs
 
 vis0g3Prefs_FILES = \
     VZRootListController.mm \
