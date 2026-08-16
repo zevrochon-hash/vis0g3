@@ -1,6 +1,4 @@
-#import <UIKit/UIKit.h>
+#import <Preferences/PSListController.h>
 
-/// Displays enrolled faces and lets the user add, remove, or rename them.
-/// Pushed from the main Settings pane.
-@interface VZFaceListController : UITableViewController
+@interface VZFaceListController : PSListController
 @end
