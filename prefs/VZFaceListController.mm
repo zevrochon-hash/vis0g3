@@ -70,16 +70,16 @@ static const NSInteger kSectionAdd   = 1;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.title = @"Enrolled Faces";
-    [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:kCellID];
-    [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:kAddCellID];
-    [self _loadProfiles];
-}
 
-- (void)viewWillAppear:(BOOL)animated {
-    [super viewWillAppear:animated];
+    self.title = @"Manage Faces";
+
+    [self.tableView registerClass:[UITableViewCell class]
+           forCellReuseIdentifier:kCellID];
+
+    [self.tableView registerClass:[UITableViewCell class]
+           forCellReuseIdentifier:kAddCellID];
+
     [self _loadProfiles];
-    [self.tableView reloadData];
 }
 
 - (void)_loadProfiles {
