@@ -130,7 +130,7 @@
     // Session
     _session = [[AVCaptureSession alloc] init];
     [_session beginConfiguration];
-    _session.sessionPreset = AVCaptureSessionPreset640x480;
+    _session.sessionPreset = AVCaptureSessionPreset1280x720;
 
     NSError *inputError;
     _deviceInput = [[AVCaptureDeviceInput alloc] initWithDevice:frontCamera error:&inputError];
