@@ -24,11 +24,10 @@
             footerText = "Up to 4 faces can be enrolled. All data is stored locally on this device.";
         },
         {
-            cell = PSLinkCell;
-            label = "Manage Faces";
-            detail = VZFaceListController;
-            isController = 1;
-        },
+    cell = PSLinkCell;
+    label = "Manage Faces";
+    action = "openFaceManagement";
+},
 
         /* ── Unlock behavior ──────────────────────────────────────────── */
         {
