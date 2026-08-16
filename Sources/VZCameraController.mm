@@ -157,10 +157,7 @@
     [_session startRunning];
     [self _setState:VZCameraStateRunning error:nil];
 
-    // Optional screen flash
-    if ([VZPreferences sharedPreferences].screenFlashEnabled) {
-        dispatch_async(dispatch_get_main_queue(), ^{ [self beginScreenFlash]; });
-    }
+
 }
 
 - (void)stopSession {
