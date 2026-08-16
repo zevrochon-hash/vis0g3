@@ -150,7 +150,7 @@
     // Preview layer
     dispatch_async(dispatch_get_main_queue(), ^{
         self->_previewLayer = [AVCaptureVideoPreviewLayer layerWithSession:self->_session];
-        self->_previewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
+        self->_previewLayer.videoGravity = AVLayerVideoGravityResizeAspect;
     });
 
     [_session commitConfiguration];
