@@ -41,12 +41,37 @@
     }
 
     // Find the topmost view controller to present on
-    UIViewController *rootVC = nil;
+    UIWindow *keyWindow = nil;
 
+if (@available(iOS 13.0, *)) {
+    for (UIScene *scene in [UIApplication sharedApplication].connectedScenes) {
+        if (![scene isKindOfClass:[UIWindowScene class]]) continue;
 
-    while (rootVC.presentedViewController) {
-        rootVC = rootVC.presentedViewController;
+        UIWindowScene *windowScene = (UIWindowScene *)scene;
+
+        if (windowScene.activationState != UISceneActivationStateForegroundActive)
+            continue;
+
+        for (UIWindow *window in windowScene.windows) {
+            if (window.isKeyWindow) {
+                keyWindow = window;
+                break;
+            }
+        }
+
+        if (keyWindow) break;
     }
+}
+
+if (!keyWindow) {
+    keyWindow = [UIApplication sharedApplication].keyWindow;
+}
+
+UIViewController *rootVC = keyWindow.rootViewController;
+
+while (rootVC.presentedViewController) {
+    rootVC = rootVC.presentedViewController;
+}
 
     if (!rootVC) {
         // No window to present from — fall back to system auth
