@@ -17,13 +17,14 @@
 
     VZPreferences *prefs = [VZPreferences sharedPreferences];
 
-    BOOL isBiometricOnly =
-        (policy == LAPolicyDeviceOwnerAuthenticationWithBiometrics);
+    BOOL isSupportedPolicy =
+        (policy == LAPolicyDeviceOwnerAuthenticationWithBiometrics ||
+         policy == LAPolicyDeviceOwnerAuthentication);
 
     if (!prefs.enabled ||
         !prefs.appAuthEnabled ||
         [VZFaceDatabase sharedDatabase].profiles.count == 0 ||
-        !isBiometricOnly) {
+        !isSupportedPolicy) {
 
         %orig;
         return;
